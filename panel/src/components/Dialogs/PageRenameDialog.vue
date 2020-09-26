@@ -21,8 +21,8 @@
       >
         <k-button
           slot="options"
+          :disabled="fields.slug.disabled"
           icon="wand"
-          data-options
           @click="sluggify(title)"
         >
           {{ $t("page.changeSlug.fromTitle") }}
@@ -56,7 +56,8 @@ export default {
           label: this.$t("title"),
           type: "text",
           required: true,
-          icon: "title"
+          icon: "title",
+          disabled: this.$permissions.page && this.$permissions.page.changeTitle && this.$permissions.page.changeTitle === false
         },
         slug: {
           name: "slug",
@@ -65,7 +66,8 @@ export default {
           required: true,
           icon: "url",
           help: "/" + this.url,
-          counter: false
+          counter: false,
+          disabled: this.$permissions.page && this.$permissions.page.changeSlug && this.$permissions.page.changeSlug === false
         }
       };
     },
