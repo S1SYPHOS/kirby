@@ -57,6 +57,7 @@
 
       <k-file-rename-dialog ref="rename" @success="update" />
       <k-file-remove-dialog ref="remove" @success="update" />
+      <k-file-sort-dialog ref="sort" @success="reload" />
       <k-upload ref="upload" @success="uploaded" @error="reload" />
     </template>
 
@@ -119,6 +120,9 @@ export default {
 
           this.$refs.remove.open(file.parent, file.filename);
           break;
+        case "sort":
+          this.$refs.sort.open(file.parent, file, this.options.apiUrl);
+          break;
       }
 
     },
@@ -134,17 +138,22 @@ export default {
     },
     items(data) {
       return data.map(file => {
-        file.options = ready => {
-          this.$api.files
-            .options(file.parent, file.filename, "list")
-            .then(options => ready(options))
-            .catch(error => {
-              this.$store.dispatch("notification/error", error);
-            });
-        };
-
         file.sortable = this.options.sortable;
         file.column   = this.column;
+        file.options  = async ready => {
+          try {
+            const options = await this.$api.files.options(
+              file.parent,
+              file.filename,
+              "list",
+              this.options.sortable
+            );
+            ready(options);
+
+          } catch (error) {
+            this.$store.dispatch("notification/error", error);
+          }
+        };
 
         return file;
       });
@@ -156,7 +165,7 @@ export default {
         multiple: false
       });
     },
-    sort(items) {
+    async sort(items) {
       if (this.options.sortable === false) {
         return false;
       }
@@ -165,18 +174,18 @@ export default {
         return item.id;
       });
 
-      this.$api
-        .patch(this.options.apiUrl + "/files/sort", {
+      try {
+        await this.$api.patch(this.options.apiUrl + "/files/sort", {
           files: items,
           index: this.pagination.offset
         })
-        .then(() => {
-          this.$store.dispatch("notification/success", ":)");
-        })
-        .catch(response => {
-          this.reload();
-          this.$store.dispatch("notification/error", response.message);
-        });
+
+        this.$store.dispatch("notification/success", ":)");
+
+      } catch (error) {
+        this.reload();
+        this.$store.dispatch("notification/error", error.message);
+      }
     },
     update() {
       this.$events.$emit("model.update");

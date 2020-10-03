@@ -1,12 +1,3 @@
-<template>
-  <k-form-dialog
-    ref="dialog"
-    v-model="form"
-    :fields="fields"
-    :submit-button="$t('change')"
-    @submit="submit"
-  />
-</template>
 
 <script>
 import PageStatusDialog from "./PageStatusDialog.vue";
@@ -21,7 +12,7 @@ export default {
           label: this.$t("page.changeStatus.position"),
           type: "select",
           empty: false,
-          options: this.sortingOptions()
+          options: this.sortingOptions
         }
       };
     }

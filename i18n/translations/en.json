@@ -194,6 +194,7 @@
   "field.users.empty": "No users selected yet",
 
   "file.delete.confirm": "Do you really want to delete <br><strong>{filename}</strong>?",
+  "file.sort": "Change position",
 
   "files": "Files",
   "files.empty": "No files yet",
